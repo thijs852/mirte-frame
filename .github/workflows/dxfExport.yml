@@ -13,7 +13,7 @@ jobs:
       - name: install nodejs
         run: |
           apt update
-          apt install curl -y
+          apt install curl zip -y
           curl -fsSL https://deb.nodesource.com/setup_24.x | bash -
           apt-get install -y nodejs
           # apt install xvfb -y
@@ -47,7 +47,7 @@ jobs:
           name: steps
           path: /tmp/mirte-frame/build/step/*
       - name: zip files
-        if: startsWith(github.ref, 'refs/tags/')
+        # if: startsWith(github.ref, 'refs/tags/')
         run: |
           cd /tmp/mirte-frame/build
           zip -r /tmp/mirte-frame-stl.zip ./stl/*
