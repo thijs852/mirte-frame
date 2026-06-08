@@ -92,7 +92,8 @@ def renderFile(freecadFile):
     doc = FreeCAD.open(str(freecadFile))
 
     # Touch the parameters so they will be taken into account
-    App.getDocument("parameters").Objects[0].touch()
+    App.getDocument('parameters').getObject('Spreadsheet').importFile(str(dir_path / "scripts/params.csv"))
+    #App.getDocument("parameters").Objects[0].touch()
     doc.recompute()
 
     bodies = list()
@@ -125,7 +126,7 @@ def renderFile(freecadFile):
         exportDXF(body, freecadFile.stem, build_dir)
         exportSTL(body, freecadFile.stem, build_dir)
         exportSTEP(body, freecadFile.stem, build_dir)
-    FreeCAD.closeDocument(freecadFile.stem)
+    #FreeCAD.closeDocument(freecadFile.stem)
 
 
 import os
@@ -140,7 +141,7 @@ if (dir_path / "build").exists():
     shutil.rmtree(dir_path / "build")
 
 # render all freecad files
-for filename in ["layer.FCStd"] #os.listdir(freecad_directory):
+for filename in ["layer.FCStd"]: #os.listdir(freecad_directory):
     f = freecad_directory / filename
     if f.suffix == ".FCStd":
         print(f.stem)
