@@ -1,7 +1,4 @@
 #!/usr/local/bin/python3
-
-rel_freecad_directory = "../freecadFiles"
-
 import sys
 
 sys.path.append("/usr/lib/freecad-python3/lib/")
@@ -73,7 +70,7 @@ def exportSTEP(body, name, build_path):
     
 def exportDXF(body, name, build_path):   
     # sv0 = Draft.make_shape2dview(body, FreeCAD.Vector(0, -1, 0))
-    FreeCAD.getDocument(name).recompute()    
+    FreeCAD.getDocument(name).recompute()
     pathOut = getFilePath(body, name, build_path, "dxf")
     
     # Code as shown in FreeCAD console when generating dxf file:
@@ -93,6 +90,11 @@ def exportDXF(body, name, build_path):
     
 def renderFile(freecadFile):
     doc = FreeCAD.open(str(freecadFile))
+
+    # Touch the parameters so they will be taken into account
+    App.getDocument("parameters").Objects[0].touch()
+    doc.recompute()
+
     bodies = list()
     for obj in doc.Objects:
         # Fix for motor clamp lock, the chamfer one is the final one
@@ -130,20 +132,15 @@ import os
 import shutil
 from pathlib import Path
 
-dir_path = Path(os.getcwd())
-print(dir_path)
-print(os.listdir(dir_path))
-freecad_directory = (dir_path / rel_freecad_directory).resolve()
-print(freecad_directory)
-print(os.listdir(freecad_directory))
+dir_path =  Path(os.path.dirname(os.path.realpath(__file__))).parent.absolute()
+freecad_directory = (dir_path / "freecadFiles").resolve()
 
 # clean build directory
-if (freecad_directory.parent / "build").exists():
-    shutil.rmtree(freecad_directory.parent / "build")
+if (dir_path / "build").exists():
+    shutil.rmtree(dir_path / "build")
 
-print(os.listdir(freecad_directory))
 # render all freecad files
-for filename in os.listdir(freecad_directory):
+for filename in ["layer.FCStd"] #os.listdir(freecad_directory):
     f = freecad_directory / filename
     if f.suffix == ".FCStd":
         print(f.stem)
