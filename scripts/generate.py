@@ -141,7 +141,7 @@ if (dir_path / "build").exists():
     shutil.rmtree(dir_path / "build")
 
 # render all freecad files
-for filename in ["layer.FCStd"]: #os.listdir(freecad_directory):
+for filename in os.listdir(freecad_directory):
     f = freecad_directory / filename
     if f.suffix == ".FCStd":
         print(f.stem)

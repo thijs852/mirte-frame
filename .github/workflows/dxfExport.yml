@@ -7,21 +7,11 @@ jobs:
   build:
     runs-on: ubuntu-latest
     container:
-      image: amrit3701/freecad-cli:1.0.2-amd64-ubuntu22.04-py3.11-qt5
+      image: ianussimoddocker/freecad:1.1.0-py313-trixie
 
     steps:
-      - name: install nodejs
-        run: |
-          apt update
-          apt install curl zip -y
-          curl -fsSL https://deb.nodesource.com/setup_24.x | bash -
-          apt-get install -y nodejs
-          # apt install xvfb -y
-
       - name: Checkout code
-        uses: actions/checkout@v4
-
-    
+        uses: actions/checkout@v6
       - name: Run FreeCAD
         run: |
             mkdir /tmp/mirte-frame
@@ -30,31 +20,33 @@ jobs:
             cp -r ./scripts /tmp/mirte-frame
             cp ./bill_of_materials.md /tmp/mirte-frame
             cd /tmp/mirte-frame/scripts
-            echo "exec(open(\"/tmp/mirte-frame/scripts/generate.py\").read())" | FreeCADCmd
+            FreeCADCmd /tmp/mirte-frame/scripts/generate.py
       - name: Upload DXF
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: dxfs
           path: /tmp/mirte-frame/build/dxf/*
       - name: Upload STL
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: stls
           path: /tmp/mirte-frame/build/stl/*
       - name: Upload STEP
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: steps
           path: /tmp/mirte-frame/build/step/*
-      - name: zip files
+      - name: Zip artifacts
         # if: startsWith(github.ref, 'refs/tags/')
         run: |
+          apt update
+          apt install curl zip -y
           cd /tmp/mirte-frame/build
           zip -r /tmp/mirte-frame-stl.zip ./stl/*
           zip -r /tmp/mirte-frame-dxf.zip ./dxf/*
           zip -r /tmp/mirte-frame-step.zip ./step/*
       - name: Push to release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v3
         if: startsWith(github.ref, 'refs/tags/')
         with:
             files: |
@@ -62,4 +54,3 @@ jobs:
               /tmp/mirte-frame-stl.zip
               /tmp/mirte-frame-step.zip
               /tmp/mirte-frame/bill_of_materials.md
-
